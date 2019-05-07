@@ -62,6 +62,7 @@ describe "camion" {
 	test "puedeCircularEnRuta(nivelMaximoPeligrosidad)" {
 		//Puede circular si ninguna cosa que transporta supera el `nivelMaximoPeligrosidad`.
 		assert.that(false)
+		
 	}
 	
 }	
