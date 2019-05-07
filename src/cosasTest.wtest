@@ -1,0 +1,11 @@
+import cosas.*
+
+describe "cosas" {
+var cosa = bumblebee
+	
+	test "cosas" {
+
+
+	assert.that(true)
+	}
+}

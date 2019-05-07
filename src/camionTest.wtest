@@ -1,0 +1,84 @@
+import camion.*
+import cosas.*
+
+object cosaPrueba1 {
+		var property peso
+		var property peligrosidad	
+}
+
+object cosaPrueba2 {
+		var property peso
+		var property peligrosidad	
+}
+	
+describe "camion" {
+	const cosa = cosaPrueba1
+	const cosa2 = cosaPrueba2
+		
+	fixture {
+	cosa.peso(0)
+    cosa.peligrosidad(0)
+    cosa2.peso(0)
+    cosa2.peligrosidad(0)
+    
+	camion.cargar(cosa)	
+	}
+
+	test "cargar(cosa)"	{
+		assert.that(camion.carga().contains(cosa))
+	}
+	
+	test "descargar(cosa)"	{ 
+		camion.descargar(cosa)
+		assert.notThat(camion.carga().contains(cosa))
+	}
+	
+	test "pesoTotal()" {
+	//es la suma del peso del camión vacío (tara) y su carga. La tara del camión es de 1 tonelada (1000 kilogramos
+	assert.that(camion.pesoTotal() == 1000 + cosa.peso())	
+	}
+	
+	test "excedidoDePeso()"  {
+		// indica si el peso total es superior al peso máximo. El cual es de 2.5 toneladas;
+		assert.notThat(camion.excedidoDePeso()) // deberia dar falso porque solo es el peso del camión que es 1000  
+		cosa.peso(1500)						 
+		assert.notThat(camion.excedidoDePeso()) // deberia seguir dando falso ya que está en le limite superior	 
+		cosa.peso(1500.01)						 
+		assert.that(camion.excedidoDePeso()) //deberia está excedido de peso ya que se excede en 1g
+		assert.that(camion.pesoTotal() == 1000 + 1500.01)
+	}
+	
+	test "objetosPeligrosos(nivel)" { 
+	// todos los objetos cargados que superan el nivel de peligrosidad indicados por el valor del parámetro;
+
+		assert.that()
+	}
+	
+	test "objetosMasPeligrososQue(cosa)" {
+		// todos los objetos cargados que son más peligrosos que la cosa;
+		assert.that(false)
+	}
+	
+	test "puedeCircularEnRuta(nivelMaximoPeligrosidad)" {
+		//Puede circular si ninguna cosa que transporta supera el `nivelMaximoPeligrosidad`.
+		assert.that(false)
+	}
+	
+}	
+/*
+# Camión de transporte
+-administrar cargas que lleva un camión.
+	-sistema que le permita planificar qué cosas debe llevar el camión sin sobrepasar su capacidad. 
+	-Por otro lado, las cosas que transporta tienen un nivel de peligrosidad. 
+	-El nivel es usado para impedir que cosas que superen cierto nivel de peligrosidad circulen en determinadas rutas.
+
+## El camión
+-Se pide que el camión entienda los siguientes mensajes:
+	* `cargar(cosa)` y `descargar(cosa)`: para manejar qué tiene;
+	* `pesoTotal()`: es la suma del peso del camión vacío (tara) y su carga. La tara del camión es de 1 tonelada (1000 kilogramos);
+	* `excedidoDePeso()`: indica si el peso total es superior al peso máximo. El cual es de 2.5 toneladas;
+	* `objetosPeligrosos(nivel)`: todos los objetos cargados que superan el nivel de peligrosidad indicados por el valor del parámetro;
+	* `objetosMasPeligrososQue(cosa)`: todos los objetos cargados que son más peligrosos que la cosa;
+	* `puedeCircularEnRuta(nivelMaximoPeligrosidad)` Puede circular si ninguna cosa que transporta supera el `nivelMaximoPeligrosidad`.
+
+	*/
