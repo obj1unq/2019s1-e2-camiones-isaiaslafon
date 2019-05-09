@@ -49,7 +49,7 @@ object bateriaAntiaerea {
 }
 
 object contenedorPortuario {
-	const contenido = []
+	const contenido = [] // const contenido = [vacio], para que no tenga null y ya no necesitaria ver si esta vacio en otros metodos.
 	
 	method estaVacio() = contenido.isEmpty()
 	
@@ -61,7 +61,8 @@ object contenedorPortuario {
 	method meter(cosa) { contenido.add(cosa)}
 	method sacar(cosa) { contenido.remove(cosa)}
 	method vaciar() { 
-		//opcion 2 contenido = []
+		//opcion 2 contenido = [vacio]
+		//opcion 3 contenido = []
 		contenido.clear() 
 	} 
 	

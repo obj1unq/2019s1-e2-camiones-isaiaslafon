@@ -1,4 +1,5 @@
 import camion.*
+import cosas.*
 
 object cosaPrueba1 {
 		var property peso = 0
@@ -74,5 +75,42 @@ describe "camion" {
 		assert.that(camion.puedeCircularEnRuta(2))
 		assert.notThat(camion.puedeCircularEnRuta(1))
 	}
+	
+	test "tieneAlgoQuePesaEntre(min, max) indica si hay algo entre min y max" {
+	assert.that(camion.tieneAlgoQuePesaEntre(0, 0))	
+	
+	camion.meter(knightRider)
+	assert.that(camion.tieneAlgoQuePesaEntre(0, 0))
+	}
+
+	test "cosaMasPesada() que tenga el camión" {
+		cosa.peso(0)
+		cosa2.peso(1)
+		assert.that(camion.cosaMasPesada() == cosa2)	
+		
+		cosa.peso(100)
+		cosa2.peso(50)
+		assert.that(camion.cosaMasPesada() == cosa)
+	}
+	
+	
+	test "totalBultos() es la suma de la cantidad de bultos que está transportando" {
+	//KnightRider, arena a granel y residuos radioactivos son 1 bulto
+	//Bumblebee y embalaje de seguridad son dos
+	//Paquete de ladrillos es 1 hasta 100 ladrillos, 2 de 101 a 300, 3 301 o más. 
+	//Batería antiaérea: 1 si no tiene misiles, 2 si tiene. 
+	//Contenedor portuario: 1 + los bultos que tiene adentro.cosaMasPesada() que tenga el camión	
+		assert.that(camion.totalBultos()(1))	
+	}
+	
+	test "pesos() devuelve la lista de pesos de cada cosa que contiene el camion" {
+		cosa.peso(0)
+		cosa2.peso(1)
+		assert.that(camion.pesos() == [0,1])
+		cosa.peso(3)
+		cosa2.peso(2)
+		assert.that(camion.pesos() == [3,2])	
+	}	
+ 
 	
 }
