@@ -13,11 +13,15 @@ object camion {
 		cosas.remove(unaCosa)
 	}
 	
+	method pesoTara() {return 1000}
 	
 	//pesoTotal()`: es la suma del peso del camión vacío (tara) y su carga. La tara del camión es de 1 tonelada (1000 kilogramos);
 	method pesoTotal() { 
-		return self.carga().sum({unaCosa => unaCosa.peso()}) + 1000
+		return if ( self.hayCarga() ) { self.carga().sum({ unaCosa => unaCosa.peso() }) + self.pesoTara() } 
+				else { self.pesoTara() }
 	}
+	
+	method hayCarga() { return not self.carga().isEmpty() }
 	
 	//* `excedidoDePeso()`: indica si el peso total es superior al peso máximo. El cual es de 2.5 toneladas;
 	method excedidoDePeso() { 
