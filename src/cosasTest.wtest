@@ -1,43 +1,97 @@
 import cosas.*
 
-describe "cosas" {
-var cosa = bumblebee
-	
-	test "cosas" {
+describe "test de cosas" {
 
+//para hacer mas sencillo el assert de cada test 
+//pero es raro no ver el assert en el test y da alerta Wollok
+const cosaPesoYPeligrosidadSon = { unaCosa, unPeso, unaPeligrosidad => assert.that(unaCosa.peso() == unPeso and unaCosa.peligrosidad() == unaPeligrosidad)}
 
-	assert.that(true)
+//para incluir assert bloque con solo condicion
+const cosaPesoYPeligrosidadBool = {unaCosa, unPeso, unaPeligrosidad => unaCosa.peso() == unPeso and unaCosa.peligrosidad() == unaPeligrosidad}
+
+	test "Knight Rider peso 500, peligrosidad 10" {
+	//sabor sin assert pero dispararia advertencia de que no contiene assert aunque da verde.
+		cosaPesoYPeligrosidadSon.apply(knightRider, 500, 10)
+	//sabor para incluir assert	
+		assert.that(cosaPesoYPeligrosidadBool.apply(knightRider, 500, 10))
 	}
+
+	test "Bumblebee pesa 800 y su peligrosidad es 15 en modo auto y 30 en robot" {
+	//por defecto Bumblebee está en modo robot que es su forma natural
+		assert.that(cosaPesoYPeligrosidadBool.apply(bumblebee, 800, 30))
+		bumblebee.transformar()
+		assert.that(cosaPesoYPeligrosidadBool.apply(bumblebee, 800, 15))
+	}
+
+	test "Paquete de ladrillos a 2Kg por Ladrillo, puede variar su cantidad y peligrosidad es 2" {
+		//al principio tiene 0 ladrillos, por ende son 0 Kilogramos.
+		assert.that(cosaPesoYPeligrosidadBool.apply(paqueteDeLadrillos, 0, 2))
+		
+		paqueteDeLadrillos.cantidad(1)
+		assert.that(cosaPesoYPeligrosidadBool.apply(paqueteDeLadrillos, 2, 2))
+		
+		paqueteDeLadrillos.cantidad(100)
+		assert.that(cosaPesoYPeligrosidadBool.apply(paqueteDeLadrillos, 200, 2))
+	}
+
+	test "Arena a granel de peso variable y peligrosidad 1" {
+		//al principio pesa 0 Kilogramos.
+		assert.that(cosaPesoYPeligrosidadBool.apply(arenaAGranel, 0, 1))
+		arenaAGranel.peso(100)
+		assert.that(cosaPesoYPeligrosidadBool.apply(arenaAGranel, 100, 1))
+	}
+
+	test "La Bateria antiaerea tiene un peso de 300 kilos y con misiles y 200 sin ellos,
+  	y su peligrosidad es 100 con misiles y  0 sin ellos" {
+		bateriaAntiaerea.dejarMisiles()
+		assert.that(cosaPesoYPeligrosidadBool.apply(bateriaAntiaerea, 300, 100))
+	
+		bateriaAntiaerea.removerMisiles()
+		assert.that(cosaPesoYPeligrosidadBool.apply(bateriaAntiaerea, 200, 0))
+	}
+
+	test "Contenedor portuario puede o no tener otras cosas adentro, pesa 100 mas todo lo que contiene y es tan peligroso como su objeto más peligroso, por lo que vacio es 0" {
+		//al principio está vacio, por lo que su peso es solo el de el contenedor y su peligrosidad 0
+		assert.that(contenedorPortuario.estaVacio())
+		assert.that(cosaPesoYPeligrosidadBool.apply(contenedorPortuario, 100, 0))
+	
+		contenedorPortuario.meter(knightRider)
+		assert.that( cosaPesoYPeligrosidadBool.apply(contenedorPortuario, 
+													 100 + knightRider.peso(),
+													 knightRider.peligrosidad()
+													 ) 
+		)
+				
+		contenedorPortuario.meter(bumblebee) //bumblebee es mas peligroso ya que esta en modo Robot, 30
+		assert.that(cosaPesoYPeligrosidadBool.apply(contenedorPortuario, 
+													100 + knightRider.peso() + bumblebee.peso(), 
+													bumblebee.peligrosidad()
+													)
+		)
+	}
+
+
+	test "Residuos radioactivos tiene peso variable y su peligrosidad es de 200" {
+		//al principio hay 0 residuos
+		//en el enunciado no dice que si hay cero residuos no hay peligro, pero se sipuno que se carga algo en el camion
+		assert.that(cosaPesoYPeligrosidadBool.apply(residuosRadioactivos, 0, 200))
+
+		residuosRadioactivos.peso(100)
+		assert.that(cosaPesoYPeligrosidadBool.apply(residuosRadioactivos, 100, 200))
+	}
+
+	test "El Embalaje de seguridad envuelve algo, pesa su contenido, y es peligroso al 50% del mismo" {
+		//al principio el envoltorio esta vacio
+		assert.that(cosaPesoYPeligrosidadBool.apply(embalajeDeSeguridad, 0, 0))
+		
+		embalajeDeSeguridad.embalar(knightRider)
+		assert.that(cosaPesoYPeligrosidadBool.apply(embalajeDeSeguridad, 
+													knightRider.peso(), 
+													knightRider.peligrosidad() / 2
+													)
+		)
+	}
+	
 }
 
-/*
-* Knight Rider: 
-		-pesa 500 kilos
-		-nivel de peligrosidad es 10.
-	* Bumblebee: 
-		-pesa 800 kilos
-		-nivel de peligrosidad es 15 si está transformado en auto o 30 si está como robot.
-		-modoRobot
-	* Paquete de ladrillos: 
-		-cada ladrillo pesa 2 kilos, 
-		-cantidad de ladrillos que tiene puede variar. 
-		-peligrosidad es 2.
-	* Arena a granel: 
-		-peso es variable, 
-		-peligrosidad es 1.
-	* Batería antiaérea : 
-		-peso es 300 kilos si está con los misiles o 200 en otro caso. 
-		-conMisiles
-		-En cuanto a la peligrosidad es 100 si está con los misiles y 0 en otro caso.
-	* Contenedor portuario: 
-		-puede tener otras cosas adentro. 
-		-El peso es 100 + la suma de todas las cosas que estén adentro. 
-		-Es tan peligroso como el objeto más peligroso que contiene. Si está vacío, su peligrosidad es 0.
-		-si esta Vacio
-	* Residuos radioactivos: 
-		-peso es variable
-		-peligrosidad es 200.
-	* Embalaje de seguridad: es una cobertura que envuelve a cualquier otra cosa. 
-		-El peso es el peso de la cosa que tenga adentro. 
-		-El nivel de peligrosidad es la mitad del nivel de peligrosidad de lo que envuelve.
-*/
+

@@ -4,8 +4,7 @@ object knightRider {
 }
 
 object bumblebee {
-	
-	var transformadoEnAuto = true
+	var transformadoEnAuto = false
 	
 	method transformadoEnAuto() = transformadoEnAuto
 	method peso() = 800
@@ -18,8 +17,7 @@ object bumblebee {
 	method transformar() { transformadoEnAuto = not transformadoEnAuto }
 }
 
-object ladrillos {
-	
+object paqueteDeLadrillos {
 	var property cantidad = 0
 	
 	method peso() = cantidad * 2
@@ -36,8 +34,8 @@ object bateriaAntiaerea {
 	
 	method conMisiles() = conMisiles
 	
-	method vaConMisiles() {conMisiles = true}
-	method vaSinMisiles() {conMisiles = false}
+	method dejarMisiles() {conMisiles = true}
+	method removerMisiles() {conMisiles = false}
 	
 	method peso() { 
 		return if (self.conMisiles()) 300 
@@ -53,19 +51,28 @@ object bateriaAntiaerea {
 object contenedorPortuario {
 	const contenido = []
 	
-	method contenedorVacio() = contenido.isEmpty()
+	method estaVacio() = contenido.isEmpty()
 	
 	method pesoContenido() { 
-		return if ( self.contenedorVacio() ) 0 
+		return if ( self.estaVacio() ) 0 
 			   else contenido.sum({ unaCosa => unaCosa.peso() })
 	}
+	
+	method meter(cosa) { contenido.add(cosa)}
+	method sacar(cosa) { contenido.remove(cosa)}
+	method vaciar() { 
+		//opcion 2 contenido = []
+		contenido.clear() 
+	} 
 	
 	method peso() = 100 + self.pesoContenido()
 	
 	method peligrosidad() {
-		return if (self.contenedorVacio()) 0
-				else contenido.max({unaCosa => unaCosa.peligrosidad()})
+		return if (self.estaVacio()) 0
+				else self.elMasPeligroso().peligrosidad()
 	}	
+	
+	method elMasPeligroso() = contenido.max({unaCosa => unaCosa.peligrosidad()})
 }
 
 object residuosRadioactivos {
@@ -73,8 +80,14 @@ object residuosRadioactivos {
 	method peligrosidad() = 200
 }
 
-/*	
-	* Embalaje de seguridad: es una cobertura que envuelve a cualquier otra cosa. 
-		-El peso es el peso de la cosa que tenga adentro. 
-		-El nivel de peligrosidad es la mitad del nivel de peligrosidad de lo que envuelve.
-*/
+object embalajeDeSeguridad {
+	var interior = vacio
+	method embalar(cosa) { interior = cosa}
+	method peso() = interior.peso()
+	method peligrosidad() = interior.peligrosidad() / 2
+}
+
+object vacio {
+	method peso() = 0
+	method peligrosidad() = 0
+}
