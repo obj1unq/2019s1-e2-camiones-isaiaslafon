@@ -7,6 +7,7 @@ object camion {
 	
 	method cargar(unaCosa) {
 		cosas.add(unaCosa)
+		[{unaCosa.sufriCambios()}, {}].anyOne().apply() 
 	}
 	
 	method descargar(unaCosa) {
@@ -40,6 +41,30 @@ object camion {
 	
 	//* `puedeCircularEnRuta(nivelMaximoPeligrosidad)` Puede circular si ninguna cosa que transporta supera el `nivelMaximoPeligrosidad`.
 	method puedeCircularEnRuta(nivelMaximoPeligrosidad) { 
-		return self.carga().all({unaCosa => unaCosa.peligrosidad() <= nivelMaximoPeligrosidad})
+		return if (not self.hayCarga()) true 
+			   else self.carga().all({unaCosa => unaCosa.peligrosidad() <= nivelMaximoPeligrosidad})
+	}
+	
+	//* `tieneAlgoQuePesaEntre(min, max)`: indica si el peso de alguna de las cosas que tiene el camión está en ese intervalo;
+	method tieneAlgoQuePesaEntre(min, max) {
+		return if (not self.hayCarga()) false 
+			   else self.carga().any({unaCarga => unaCarga.peso().between(min,max)})
+	}
+	
+	//* `cosaMasPesada()`: la cosa más pesada que tenga el camión. Ojo que lo que se pide es _la cosa_ y no su peso.
+	method cosaMasPesada() {
+		return self.carga().max({unaCosa => unaCosa.peso()})
+	}
+	
+	//* `totalBultos()`: la suma de la cantidad de bultos que está transportando. KnightRider, arena a granel y residuos radioactivos son 1 bulto. Bumblebee y embalaje de seguridad son dos. Paquete de ladrillos es 1 hasta 100 ladrillos, 2 de 101 a 300, 3 301 o más. Batería antiaérea: 1 si no tiene misiles, 2 si tiene. Contenedor portuario: 1 + los bultos que tiene adentro.
+	method totalBultos() {
+		return if (not self.hayCarga()) 0 else self.carga().sum({unaCosa => unaCosa.bultos()})
+	}
+	
+	//* `pesos()`: devuelve una lista con _los pesos_ de cada cosa que tiene el camión.
+	method pesos() {
+		return if ( not self.hayCarga()) [] else self.carga().map({unaCosa => unaCosa.peso()})
 	}
 }
+
+

@@ -43,10 +43,10 @@ const cosaPesoYPeligrosidadBool = {unaCosa, unPeso, unaPeligrosidad => unaCosa.p
 
 	test "La Bateria antiaerea tiene un peso de 300 kilos y con misiles y 200 sin ellos,
   	y su peligrosidad es 100 con misiles y  0 sin ellos" {
-		bateriaAntiaerea.dejarMisiles()
+		bateriaAntiaerea.cargaMisiles()
 		assert.that(cosaPesoYPeligrosidadBool.apply(bateriaAntiaerea, 300, 100))
 	
-		bateriaAntiaerea.removerMisiles()
+		bateriaAntiaerea.descargaMisiles()
 		assert.that(cosaPesoYPeligrosidadBool.apply(bateriaAntiaerea, 200, 0))
 	}
 
@@ -90,6 +90,97 @@ const cosaPesoYPeligrosidadBool = {unaCosa, unPeso, unaPeligrosidad => unaCosa.p
 													knightRider.peligrosidad() / 2
 													)
 		)
+	}
+	
+	test "KnightRider, arena a granel y residuos radioactivos son 1 bulto" {
+		assert.that([knightRider, arenaAGranel, residuosRadioactivos].all({unaCosa => unaCosa.bultos() == 1})) 
+	}
+	
+	test "Bumblebee y embalaje de seguridad son dos bultos"
+	{
+		assert.that([bumblebee, embalajeDeSeguridad].all({unaCosa => unaCosa.bultos() == 2}))
+	}
+	
+	test "Paquete de ladrillos es 1 bulto hasta 100 ladrillos, 2 de 101 a 300, 3 301 o mas"
+	{
+		paqueteDeLadrillos.cantidad(0)
+		assert.that(paqueteDeLadrillos.bultos() ==1)
+		paqueteDeLadrillos.cantidad(100)
+		assert.that(paqueteDeLadrillos.bultos() ==1)
+		paqueteDeLadrillos.cantidad(101)
+		assert.that(paqueteDeLadrillos.bultos() ==2)
+		paqueteDeLadrillos.cantidad(201)
+		assert.that(paqueteDeLadrillos.bultos() ==2)
+		paqueteDeLadrillos.cantidad(300)
+		assert.that(paqueteDeLadrillos.bultos() ==2)
+		paqueteDeLadrillos.cantidad(301)
+		assert.that(paqueteDeLadrillos.bultos() ==3)
+		paqueteDeLadrillos.cantidad(3000)
+		assert.that(paqueteDeLadrillos.bultos() ==3)
+	}
+	
+	test "Batería antiaérea: 1 bulto si no tiene misiles, 2 si tiene" 
+	{
+		bateriaAntiaerea.descargaMisiles()
+		assert.that(bateriaAntiaerea.bultos() ==1)
+		bateriaAntiaerea.cargaMisiles()
+		assert.that(bateriaAntiaerea.bultos() ==2)
+	}
+	
+	test "Contenedor portuario: 1 bulto, mas los bultos que tiene adentro"
+	{
+		assert.that(contenedorPortuario.bultos() == 1)
+		contenedorPortuario.meter(knightRider)
+		assert.that(contenedorPortuario.bultos() == 2)
+		contenedorPortuario.meter(arenaAGranel)
+		assert.that(contenedorPortuario.bultos() == 3)
+	}
+	
+	test "Sufrir cambios de cada cosa surte el efecto buscado (leer comentarios)" {
+	//-KnightRider: no hace nada, embalaje de seguridad: nada. Cómo testeo los que no hacen nada? Accedo a cada variable del estado?
+		knightRider.sufriCambios()
+		assert.that(knightRider.peso() == 500)
+		assert.that(knightRider.peligrosidad() == 10)
+		assert.that(knightRider.bultos() == 1)
+		
+		embalajeDeSeguridad.sufriCambios()
+		assert.that(vacio.peso() == 0)
+		assert.that(vacio.bultos() == 0)
+		assert.that(embalajeDeSeguridad.bultos() == 2)
+		assert.that(vacio.peligrosidad() == 0)
+		
+	//- Bumblebee: pasa a robot;
+		if (not bumblebee.transformadoEnAuto()) bumblebee.transformar()
+		bumblebee.sufriCambios()
+		assert.notThat(bumblebee.transformadoEnAuto())
+
+	//- paquete de ladrillos: agrega 12 ladrillos;
+		paqueteDeLadrillos.cantidad(0)
+		paqueteDeLadrillos.sufriCambios()
+		assert.that(paqueteDeLadrillos.cantidad() == 12)
+	
+	//- arena a granel: agrega 20 kilos;
+		arenaAGranel.sufriCambios()
+		assert.that(arenaAGranel.peso() == 20)
+		
+	//- batería antiaérea: carga misiles;
+		bateriaAntiaerea.descargaMisiles()
+		bateriaAntiaerea.sufriCambios()
+		assert.that(bateriaAntiaerea.conMisiles())
+	
+	//- contenedor portuario: hace que reaccione cada una de las cosas que tiene adentro;
+		paqueteDeLadrillos.cantidad(0)
+		contenedorPortuario.meter(paqueteDeLadrillos)
+	
+		if (not bumblebee.transformadoEnAuto()) bumblebee.transformar()
+		contenedorPortuario.meter(bumblebee)
+	
+		contenedorPortuario.sufriCambios()
+		assert.that(paqueteDeLadrillos.cantidad() == 12 and not bumblebee.transformadoEnAuto())
+
+	//- residuos radioactivos: agrega 15 kilos;
+		residuosRadioactivos.sufriCambios()
+		assert.that(residuosRadioactivos.peso() == 15)		
 	}
 	
 }
