@@ -18,8 +18,10 @@ object camion {
 	
 	//pesoTotal()`: es la suma del peso del camión vacío (tara) y su carga. La tara del camión es de 1 tonelada (1000 kilogramos);
 	method pesoTotal() { 
-		return if ( self.hayCarga() ) { self.carga().sum({ unaCosa => unaCosa.peso() }) + self.pesoTara() } 
-				else { self.pesoTara() }
+		//return if ( self.hayCarga() ) { self.carga().sum({ unaCosa => unaCosa.peso() }) + self.pesoTara() } 
+		//		else { self.pesoTara() }
+		//No era necesario el iff, ya que un sum de una lista vacia da 0, quedo mal en la entrga
+		return self.carga().sum({ unaCosa => unaCosa.peso() }) + self.pesoTara()
 	}
 	
 	method hayCarga() { return not self.carga().isEmpty() }

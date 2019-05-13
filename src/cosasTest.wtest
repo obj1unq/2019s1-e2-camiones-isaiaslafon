@@ -184,5 +184,3 @@ const cosaPesoYPeligrosidadBool = {unaCosa, unPeso, unaPeligrosidad => unaCosa.p
 	}
 	
 }
-
-
