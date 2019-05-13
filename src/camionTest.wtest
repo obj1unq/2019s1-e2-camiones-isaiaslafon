@@ -4,21 +4,28 @@ import cosas.*
 object cosaPrueba1 {
 		var property peso = 0
 		var property peligrosidad = 0	
+		var property sufrioCambios = false //agregado para probar la carga al camion en la que un objeto puede o no sufrir cambios.
+		method sufriCambios() { self.sufrioCambios(true)}
+		method bultos() = 1
 }
 
 object cosaPrueba2 {
 		var property peso = 0
-		var property peligrosidad = 0	
+		var property peligrosidad = 0
+		var property sufrioCambios = false //agregado para probar la carga al camion en la que un objeto puede o no sufrir cambios.
+		method sufriCambios() { self.sufrioCambios(true)}	
+		method bultos() = 1
 }
-	
+
 
 
 describe "camion" {
 	const cosa = cosaPrueba1
 	const cosa2 = cosaPrueba2
+	
 	const ponerACero = {
 		unaCosa => unaCosa.peso(0)
-					unaCosa.peligrosidad(0)						
+					unaCosa.peligrosidad(0)		
 }
 
 	fixture {
@@ -107,11 +114,28 @@ describe "camion" {
 	test "pesos() devuelve la lista de pesos de cada cosa que contiene el camion" {
 		cosa.peso(0)
 		cosa2.peso(1)
+		camion.cargar(cosa2)
 		assert.that(camion.pesos() == [0,1])
 		cosa.peso(3)
 		cosa2.peso(2)
 		assert.that(camion.pesos() == [3,2])	
 	}	
  
-	
+	test "cargar cosas al camion puede hacer sufrir cambios a los objetos" {
+		//al principio "cosa" puede haber sufrido cambios ya que en el fixture es cargado al camion.
+		assert.notThat(cosa2.sufrioCambios())
+		
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		
+		assert.that(cosa.sufrioCambios() or cosa2.sufrioCambios())
+	}
 }
