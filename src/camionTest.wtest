@@ -1,0 +1,141 @@
+import camion.*
+import cosas.*
+
+object cosaPrueba1 {
+		var property peso = 0
+		var property peligrosidad = 0	
+		var property sufrioCambios = false //agregado para probar la carga al camion en la que un objeto puede o no sufrir cambios.
+		method sufriCambios() { self.sufrioCambios(true)}
+		method bultos() = 1
+}
+
+object cosaPrueba2 {
+		var property peso = 0
+		var property peligrosidad = 0
+		var property sufrioCambios = false //agregado para probar la carga al camion en la que un objeto puede o no sufrir cambios.
+		method sufriCambios() { self.sufrioCambios(true)}	
+		method bultos() = 1
+}
+
+
+
+describe "camion" {
+	const cosa = cosaPrueba1
+	const cosa2 = cosaPrueba2
+	
+	const ponerACero = {
+		unaCosa => unaCosa.peso(0)
+					unaCosa.peligrosidad(0)		
+}
+
+	fixture {
+	ponerACero.apply(cosa)
+	ponerACero.apply(cosa2)
+	camion.cargar(cosa)	
+	}
+
+	test "cargar(cosa)"	{
+		assert.that(camion.carga().contains(cosa))
+	}
+	
+	test "descargar(cosa)"	{ 
+		camion.descargar(cosa)
+		assert.notThat(camion.carga().contains(cosa))
+	}
+	
+	test "pesoTotal()" {
+	//es la suma del peso del camión vacío (tara) y su carga. La tara del camión es de 1 tonelada (1000 kilogramos
+	assert.that(camion.pesoTotal() == 1000 + cosa.peso())	
+	}
+	
+	test "excedidoDePeso()"  {
+		// indica si el peso total es superior al peso máximo. El cual es de 2.5 toneladas;
+		assert.notThat(camion.excedidoDePeso()) // deberia dar falso porque solo es el peso del camión que es 1000  
+		cosa.peso(1500)						 
+		assert.notThat(camion.excedidoDePeso()) // deberia seguir dando falso ya que está en le limite superior	 
+		cosa.peso(1500.01)						 
+		assert.that(camion.excedidoDePeso()) //deberia está excedido de peso ya que se excede en 1g
+		assert.that(camion.pesoTotal() == 1000 + 1500.01)
+	}
+	
+	test "objetosPeligrosos(nivel)" { 
+	// todos los objetos cargados que superan el nivel de peligrosidad indicados por el valor del parámetro;
+	cosa.peligrosidad(1)
+	cosa2.peligrosidad(3)
+	camion.cargar(cosa2)
+		assert.that(camion.objetosPeligrosos(2) == [cosa2])
+	}
+	
+	test "objetosMasPeligrososQue(cosa)" {
+		// todos los objetos cargados que son más peligrosos que la cosa;
+		cosa.peligrosidad(1)
+		cosa2.peligrosidad(2)
+		camion.cargar(cosa2)
+		assert.that(camion.objetosMasPeligrososQue(cosa) == [cosa2])
+	}
+	
+	test "puedeCircularEnRuta(nivelMaximoPeligrosidad)" {
+		//Puede circular si ninguna cosa que transporta supera el `nivelMaximoPeligrosidad`.
+		cosa.peligrosidad(1)
+		cosa2.peligrosidad(2)
+		camion.cargar(cosa2)
+		assert.that(camion.puedeCircularEnRuta(2))
+		assert.notThat(camion.puedeCircularEnRuta(1))
+	}
+	
+	test "tieneAlgoQuePesaEntre(min, max) indica si hay algo entre min y max" {
+	assert.that(camion.tieneAlgoQuePesaEntre(0, 0))	
+	
+	camion.cargar(knightRider)
+	assert.that(camion.tieneAlgoQuePesaEntre(0, 0))
+	}
+
+	test "cosaMasPesada() que tenga el camión" {
+		cosa.peso(0)
+		cosa2.peso(1)
+		camion.cargar(cosa2)
+		assert.that(camion.cosaMasPesada() == cosa2)	
+		
+		cosa.peso(100)
+		cosa2.peso(50)
+		assert.that(camion.cosaMasPesada() == cosa)
+	}
+	
+	
+	test "totalBultos() es la suma de la cantidad de bultos que está transportando" {
+	//KnightRider, arena a granel y residuos radioactivos son 1 bulto
+	//Bumblebee y embalaje de seguridad son dos
+	//Paquete de ladrillos es 1 hasta 100 ladrillos, 2 de 101 a 300, 3 301 o más. 
+	//Batería antiaérea: 1 si no tiene misiles, 2 si tiene. 
+	//Contenedor portuario: 1 + los bultos que tiene adentro.cosaMasPesada() que tenga el camión	
+		assert.that(camion.totalBultos() == 1)	
+	}
+	
+	test "pesos() devuelve la lista de pesos de cada cosa que contiene el camion" {
+		cosa.peso(0)
+		cosa2.peso(1)
+		camion.cargar(cosa2)
+		assert.that(camion.pesos() == [0,1])
+		cosa.peso(3)
+		cosa2.peso(2)
+		assert.that(camion.pesos() == [3,2])	
+	}	
+ 
+	test "cargar cosas al camion puede hacer sufrir cambios a los objetos" {
+		//al principio "cosa" puede haber sufrido cambios ya que en el fixture es cargado al camion.
+		assert.notThat(cosa2.sufrioCambios())
+		
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		camion.cargar(cosa)
+		camion.cargar(cosa2)
+		
+		assert.that(cosa.sufrioCambios() or cosa2.sufrioCambios())
+	}
+}
